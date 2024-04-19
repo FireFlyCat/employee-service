@@ -33,7 +33,7 @@ public class EmployeeService {
 
         for (EmployeeEntity manager : employees) {
             BigDecimal averageSalary = getSubordinatesAverageSalary(manager, employees);
-            BigDecimal coefficient = BigDecimal.ONE.add(new BigDecimal(lowerSalaryLimit).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
+            BigDecimal coefficient = getCoefficient(lowerSalaryLimit);
             if (averageSalary.compareTo(BigDecimal.ZERO) != 0 &&
                     manager.salary().divide(averageSalary, 2, RoundingMode.HALF_UP).compareTo(coefficient) < 0) {
                 result.add(ManagerSalaryInfo.toManagerSalaryInfo(manager, averageSalary.multiply(coefficient).subtract(manager.salary())));
@@ -53,7 +53,7 @@ public class EmployeeService {
 
         for (EmployeeEntity manager : employees) {
             BigDecimal averageSalary = getSubordinatesAverageSalary(manager, employees);
-            BigDecimal coefficient = BigDecimal.ONE.add(new BigDecimal(upperSalaryLimit).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
+            BigDecimal coefficient = getCoefficient(upperSalaryLimit);
             if (averageSalary.compareTo(BigDecimal.ZERO) != 0 &&
                     manager.salary().divide(averageSalary, 2, RoundingMode.HALF_UP).compareTo(coefficient) > 0) {
                 result.add(ManagerSalaryInfo.toManagerSalaryInfo(manager, manager.salary().subtract(averageSalary.multiply(coefficient))));
@@ -121,5 +121,9 @@ public class EmployeeService {
             return sum.divide(new BigDecimal(employeesSalary.size()), RoundingMode.HALF_UP);
         }
         return BigDecimal.ZERO;
+    }
+
+    private BigDecimal getCoefficient(int salaryLimit) {
+        return BigDecimal.ONE.add(new BigDecimal(salaryLimit).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
     }
 }
